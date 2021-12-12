@@ -1,0 +1,37 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class January_System : MonoBehaviour
+{
+    [SerializeField] Moon moon;
+    [SerializeField] Tteok _tteok;
+
+    public Tteok tteok { get => _tteok; set { tteok = value; } }
+    void Start()
+    {
+        CameraManager.Instance.MoveCam(moon.transform.position, 2);
+        //StartCoroutine(TteokSpawn());
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            moon.StartCoroutine(moon.TteokAnimation());
+        }
+        else if (Input.GetKeyDown(KeyCode.Return))
+        {
+            CameraManager.Instance.MoveCam(Vector2.zero, 2);
+        }
+        else if(Input.GetKeyDown(KeyCode.F12))
+    }
+    IEnumerator TteokSpawn()
+    {
+        while (true)
+        {
+            Instantiate(tteok, new Vector2(Random.Range(-2.3f, 2.3f), 6), Quaternion.identity);
+            yield return new WaitForSeconds(Random.Range(0.5f, 2));
+        }
+    }
+}

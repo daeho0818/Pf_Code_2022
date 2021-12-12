@@ -1,0 +1,20 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class January_System : MonoBehaviour
+{
+    [SerializeField] Moon moon;
+    void Start()
+    {
+        CameraManager.Instance.MoveCam(moon.transform.position, 2);
+    }
+
+    void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            moon.StartCoroutine(moon-TteokAnimation());
+        }
+    }
+}

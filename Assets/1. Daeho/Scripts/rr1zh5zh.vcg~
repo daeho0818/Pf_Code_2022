@@ -1,0 +1,224 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using TMPro;
+
+
+public abstract class GameSystem : MonoBehaviour
+{
+    public ScoreHelper score_helper;
+    public UIHelper ui_helper;
+    public TimerHelper timer_helper;
+
+    [SerializeField] TextMeshProUGUI countdown_text;
+
+    [Header("Result Window")]
+    [SerializeField] RectTransform result_window;
+    // "게임 오버.." or "게임 클리어"로 값 설정
+    public TextMeshProUGUI result_text;
+    // 중앙에 들어갈 여러 가지 정보들 담은 Text
+    public TextMeshProUGUI information_text;
+    // fade 처리할 모든 UI
+    public TextMeshProUGUI[] fading_texts;
+    public UnityEngine.UI.Image[] fading_images;
+    [Space(10)]
+    [SerializeField] RectTransform setting_window;
+    [Space(10)]
+    public int game_timer;
+
+    protected string information_text_string;
+
+
+    public delegate void Function();
+    IEnumerator[] show_setting_window_animation_functions;
+    Function[] hide_setting_window_animation_functions;
+
+    public bool is_game_start { get; set; }
+    public bool game_clear { get; set; }
+    public bool game_over { get; set; }
+    public bool game_end { get => game_clear || game_over; }
+
+    protected virtual void Awake()
+    {
+    }
+    protected virtual void Start()
+    {
+        show_setting_window_animation_functions = new IEnumerator[3]
+        {
+            ui_helper.Scaling(setting_window, Vector2.one * 1.2f, 20f),
+            ui_helper.Scaling(setting_window, Vector2.one * 0.8f, 20f),
+            ui_helper.Scaling(setting_window, Vector2.one, 20f)
+        };
+        () => { Time.timeScale = 0; };
+
+        hide_setting_window_animation_functions = new Function[2]
+        {
+            () => { ui_helper.Scaling(setting_window, Vector2.zero, 20); },
+            () => { setting_window.gameObject.SetActive(false); },
+        };
+    }
+
+    protected virtual void Update()
+    {
+        if (!is_game_start || game_end) return;
+
+        if (timer_helper.TimerEnd() && !game_end)
+        {
+            GameEnd();
+        }
+    }
+
+    protected abstract void GameEnd();
+    protected void ShowUIs()
+    {
+        UnityEngine.UI.Image[] images = FindObjectsOfType<UnityEngine.UI.Image>();
+        TextMeshProUGUI[] texts = FindObjectsOfType<TextMeshProUGUI>();
+
+        foreach (var image in images)
+            StartCoroutine(ui_helper.Fading(image, null, 1, 3));
+
+        foreach (var text in texts)
+            StartCoroutine(ui_helper.Fading(null, text, 1, 3));
+    }
+
+    /// <summary>
+    /// 미니게임 시작 시 3, 2, 1, 게임 시작 애니메이션
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerator StartAnimation()
+    {
+        countdown_text.gameObject.SetActive(true);
+
+        Function function = () =>
+        {
+            countdown_text.rectTransform.localScale = Vector2.one * 5;
+            ui_helper.Scaling(countdown_text.rectTransform, Vector2.one, 7);
+        };
+
+        countdown_text.text = "3";
+        function();
+        yield return new WaitForSeconds(1f);
+
+        countdown_text.text = "2";
+        function();
+
+        yield return new WaitForSeconds(1f);
+
+        countdown_text.text = "1";
+        function();
+
+        yield return new WaitForSeconds(1f);
+
+        countdown_text.text = "게임 시작!";
+        function();
+
+        yield return new WaitForSeconds(2f);
+
+        countdown_text.gameObject.SetActive(false);
+    }
+    public IEnumerator FinishAnimation()
+    {
+        yield return null;
+
+        result_window.parent.gameObject.SetActive(true);
+
+        ui_helper.Moving(result_window, Vector2.zero, 7);
+
+        StartCoroutine(() => { ui_helper.Moving(result_text.rectTransform, new Vector2(0f, 420f), 7); }, 0.75f);
+
+        foreach (var fading_text in fading_texts)
+        {
+            StartCoroutine(
+                ui_helper.Fading(null, fading_text, 1, 3), 0.5f);
+        }
+        foreach (var fading_image in fading_images)
+        {
+            StartCoroutine(
+                ui_helper.Fading(fading_image, null, 1, 3), 0.5f);
+        }
+
+        yield return new WaitForSeconds(2f);
+
+        for (int i = 0; i < information_text_string.Length; i++)
+        {
+            information_text.text += information_text_string[i];
+            yield return new WaitForSeconds(0.05f);
+        }
+    }
+
+    /// <summary>
+    /// 설정 창 연출과 함께 띄우는 함수
+    /// </summary>
+    public void ShowSettingWindow()
+    {
+        setting_window.localScale = Vector2.zero;
+        setting_window.gameObject.SetActive(true);
+        StartCoroutine(StartCoroutines(
+            show_setting_window_animation_functions, new float[3] { 0.1f, 0.1f, 0.1f }));
+    }
+    /// <summary>
+    /// 설정 창 연출과 함께 가리는 함수
+    /// </summary>
+    public void HideSettingWindow()
+    {
+        Time.timeScale = 1;
+        StartCoroutine(StartCoroutines(
+            hide_setting_window_animation_functions, new float[2] { 0.1f, 0.5f }));
+    }
+    /// <summary>
+    /// 일정 시간 뒤 StartCoroutine에 enumerator를 넘겨 실행해주는 함수
+    /// </summary>
+    /// <param name="enumerator">실행할 enumerator</param>
+    /// <param name="time">기다릴 시간 (단위 : 초)</param>
+    public void StartCoroutine(IEnumerator enumerator, float time)
+    {
+        StartCoroutine(_StartCoroutine(enumerator, time));
+    }
+    IEnumerator _StartCoroutine(IEnumerator enumerator, float time)
+    {
+        yield return new WaitForSeconds(time);
+        yield return StartCoroutine(enumerator);
+        Debug.Log($"operated {nameof(enumerator)}.");
+        yield break;
+    }
+
+    /// <summary>
+    /// 일정 시간 뒤 void 형식과 매개변수가 없는 함수를 실행해주는 함수
+    /// </summary>
+    /// <param name="function">실행할 함수 (void, 매개변수 없음)</param>
+    /// <param name="time">기다릴 시간 (단위 : 초)</param>
+    public void StartCoroutine(Function function, float time)
+    {
+        StartCoroutine(_StartCoroutine(function, time));
+    }
+    IEnumerator _StartCoroutine(Function function, float time)
+    {
+        yield return new WaitForSeconds(time);
+        function();
+        Debug.Log($"operated {nameof(function)}.");
+        yield break;
+    }
+
+    public IEnumerator StartCoroutines(Function[] functions, float[] times)
+    {
+        yield return StartCoroutine(_StartCoroutines(functions, times));
+    }
+    public IEnumerator StartCoroutines(IEnumerator[] enumerators, float[] times)
+    {
+        yield return StartCoroutine(_StartCoroutines(enumerators, times));
+    }
+    IEnumerator _StartCoroutines(Function[] functions, float[] times)
+    {
+        for (int i = 0; i < functions.Length; i++)
+        {
+            yield return _StartCoroutine(functions[i], times[i]);
+        }
+    }
+    IEnumerator _StartCoroutines(IEnumerator[] enumerators, float[] times)
+    {
+        for (int i = 0; i < enumerators.Length; i++)
+        {
+            yield return _StartCoroutine(enumerators[i], times[i]);
+        }
+    }
+}
