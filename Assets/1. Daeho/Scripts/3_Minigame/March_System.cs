@@ -71,7 +71,7 @@ public class March_System : GameSystem
     {
         int score = score_helper.GetScore();
 
-        game_clear = score >= 2000;
+        game_clear = score >= 1000;
         game_over = !game_clear;
 
         if (game_clear)

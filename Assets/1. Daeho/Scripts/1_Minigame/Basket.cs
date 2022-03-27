@@ -27,7 +27,10 @@ public class Basket : MonoBehaviour
                 transform.position = new Vector2(2.3f, transform.position.y);
             else if (transform.position.x < -2.3f)
                 transform.position = new Vector2(-2.3f, transform.position.y);
-
+        }
+        else
+        {
+            direction_x = ((int)Input.GetAxisRaw("Horizontal"));
             transform.Translate((Vector2.right * direction_x) * Time.deltaTime * move_speed);
         }
     }

@@ -474,10 +474,10 @@ MonoBehaviour:
   countdown_text: {fileID: 1706821927}
   resultWindow: {fileID: 1941139719}
   setting_window: {fileID: 1419711351}
-  game_timer: 60
+  game_timer: 30
   santa: {fileID: 1079229219}
   backgrounds: {fileID: 68869319}
-  scroll_speed: 2
+  scroll_speed: 10
   spawn_points:
   - {fileID: 604388839}
   - {fileID: 1824317172}

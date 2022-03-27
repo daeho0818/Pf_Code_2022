@@ -1548,7 +1548,7 @@ MonoBehaviour:
   countdown_text: {fileID: 1181592139}
   resultWindow: {fileID: 922920216}
   setting_window: {fileID: 525067481}
-  game_timer: 60
+  game_timer: 30
   flag_prefab: {fileID: -2143950952309156066, guid: 96f6364115382d24385724c5097c3df6, type: 3}
   game_canvas: {fileID: 53595886}
   flag_text: {fileID: 1611805862}

@@ -1337,7 +1337,7 @@ MonoBehaviour:
   countdown_text: {fileID: 1181592139}
   resultWindow: {fileID: 1256542861}
   setting_window: {fileID: 525067481}
-  game_timer: 60
+  game_timer: 30
   virus_prefab:
   - {fileID: 2653585891652628551, guid: 4cc38bf2638c69f49af839cd4a66771b, type: 3}
   - {fileID: 2653585891652628551, guid: d02f5779b5aab954a893e2effda3e94c, type: 3}

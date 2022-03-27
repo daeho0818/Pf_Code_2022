@@ -96,22 +96,24 @@ public class Ending_System : GameSystem
         if (Input.GetKeyDown(KeyCode.F3))
             character.hp = (character.hp == 100 ? 10000000000000 : 100);
 
-        if (!character.player_dead && character.hp <= 0)
-        {
-            StartCoroutine(character.DeadAnimation());
-            character.player_dead = true;
-        }
+        if (character)
+            if (!character.player_dead && character.hp <= 0)
+            {
+                StartCoroutine(character.DeadAnimation());
+                character.player_dead = true;
+            }
 
-        if(!boss_obj.is_dead && boss_obj.hp <= 0)
-        {
-            StartCoroutine(boss_obj.DestroyAnimation());
-        }
+        if (boss_obj)
+            if (!boss_obj.is_dead && boss_obj.hp <= 0)
+            {
+                StartCoroutine(boss_obj.DestroyAnimation());
+            }
 
         if (!character && !game_end)
         {
             GameEnd();
         }
-        else if(!boss_obj && !game_end)
+        else if (!boss_obj && !game_end)
         {
             GameEnd();
         }

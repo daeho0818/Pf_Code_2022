@@ -35,7 +35,7 @@ public class LockDown : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.F12))
         {
-            LockCount = 55555555;
+            LockCount = 0;
             PlayerPrefs.SetInt("Lock Count", LockCount);
         }
     }
